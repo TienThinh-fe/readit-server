@@ -10,12 +10,12 @@ namespace server.Controllers
     public class ResultController : Controller
     {
         [HttpGet]
-        public ActionResult<List<Result>> getAllResult([FromBody] string userId)
+        public ActionResult<List<Result>> getAllResult(string userId)
         {
             List<Result> results = new List<Result>();
 
             var db = new ReadItContext();
-            results = db.Results.ToList();
+            results = db.Results.Where(result => result.UserId == userId).ToList();
 
             if (results != null)
             {
@@ -33,6 +33,21 @@ namespace server.Controllers
             db.Results.Add(result);
             db.SaveChanges();
             return Ok();
+        }
+
+        [HttpDelete]
+        public ActionResult deleteResult(int id)
+        {
+            var db = new ReadItContext();
+            Result deleteResult = new Result();
+            if (db.Results.SingleOrDefault(result => result.Id == id) != null)
+            {
+                deleteResult = db.Results.SingleOrDefault(result => result.Id == id);
+                db.Results.Remove(deleteResult);
+                db.SaveChanges();
+                return Ok("DELETE SUCCESSFULLY");
+            };
+            return NotFound("RESULT DOES NOT EXIST");
         }
     }
 }

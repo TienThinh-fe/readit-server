@@ -28,7 +28,7 @@ namespace server.Controllers
             }
             else
             {
-                return BadRequest("USER EXISTED");
+                return new JsonResult("USER EXISTED");
             }
         }
 
