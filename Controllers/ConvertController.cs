@@ -1,12 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using IronOcr;
+using System.Drawing;
 
 namespace server.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors]
     public class ConvertController : Controller
     {
-        public IActionResult Index()
+        [HttpPost]
+        public async Task<IActionResult> ImageUpload(IFormFile file)
         {
-            return View();
+            if (file.Length == 0)
+            {
+                return NotFound();
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    using (var img = Image.FromStream(memoryStream))
+                    {
+                        var Result = new IronOcr.IronTesseract().Read(img);
+                        return new JsonResult(Result);
+                    }
+                }
+            }
         }
     }
 }
